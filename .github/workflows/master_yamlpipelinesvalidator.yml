@@ -1,0 +1,39 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP.Net Core app to Azure Web App - yamlpipelinesvalidator
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./YAMLPipelineValidator
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.102'
+
+    - name: Build with dotnet
+      working-directory: ${{env.working-directory}}
+      run: dotnet build --configuration Release
+
+    - name: dotnet publish
+      working-directory: ${{env.working-directory}}
+      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v1
+      with:
+        app-name: 'yamlpipelinesvalidator'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_adc905fd5dad465a9868690c980edcd8 }}
+        package: ${{env.DOTNET_ROOT}}/myapp 
