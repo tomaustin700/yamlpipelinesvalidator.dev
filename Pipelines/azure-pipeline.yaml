@@ -1,0 +1,11 @@
+trigger: none
+
+stages:
+- stage: Run
+  jobs:
+  - job: "Run"
+    pool:
+      vmImage: vs2017-win2016
+    steps:
+    - powershell: 
+      displayName: 'PowerShell Script'

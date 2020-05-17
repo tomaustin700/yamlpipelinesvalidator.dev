@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YAMLPipelineValidator", "YAMLPipelineValidator\YAMLPipelineValidator.csproj", "{E349682D-E70B-4C9E-A375-56FC6D22C193}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E349682D-E70B-4C9E-A375-56FC6D22C193}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E349682D-E70B-4C9E-A375-56FC6D22C193}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E349682D-E70B-4C9E-A375-56FC6D22C193}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E349682D-E70B-4C9E-A375-56FC6D22C193}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6C5229EB-3DA0-4C5C-85B5-B69E17231B57}
+	EndGlobalSection
+EndGlobal
