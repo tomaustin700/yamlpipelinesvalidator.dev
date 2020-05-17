@@ -11,6 +11,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./YAMLPipelineValidator
 
     steps:
     - uses: actions/checkout@master
@@ -21,9 +23,11 @@ jobs:
         dotnet-version: '3.1.102'
 
     - name: Build with dotnet
+      working-directory: ${{env.working-directory}}
       run: dotnet build --configuration Release
 
     - name: dotnet publish
+      working-directory: ${{env.working-directory}}
       run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
     - name: Deploy to Azure Web App
