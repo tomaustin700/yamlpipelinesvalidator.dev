@@ -14,10 +14,6 @@
         width: 1000px
     }
 
-    .xml {
-        height: 1000px
-    }
-
     .left-align {
         text-align: left;
     }
@@ -54,14 +50,17 @@
 
         </div>
         <div class="input-div">
-            <h5 class="left-align" for="xml">YAML</h5>
+            <h5 class="left-align" for="yaml">YAML</h5>
             <div>
-                <textarea class="input xml" type="text" id="yamlInput"></textarea>
+                <textarea class="input yaml" type="text" id="yamlInput"></textarea>
             </div>
         </div>
-        <div class="left-align button-div">
+        <div class="button-div" style="float: left;">
             <button type="button" class="btn btn-light" id="validateButton">Validate</button>
             <button type="button" class="btn btn-light" id="clearButton">Clear</button>
+        </div>
+        <div class="button-div" style="float: right;">
+            <button type="button" class="btn btn-light" id="shareButton">Share</button>
         </div>
     </fieldset>
 
@@ -78,6 +77,7 @@
 <link rel="stylesheet" href="~/lib/codemirror/codemirror.css">
 <script src="~/lib/codemirror/codemirror.js"></script>
 <script src="~/lib/codemirror/mode/yaml/yaml.js"></script>
+<script src="~/lib/lz-string/lz-string.js"></script>
 
 
 <script type="text/javascript">
@@ -89,12 +89,41 @@
             lineNumbers: true,
         });
 
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+
+        if (urlParams.has('yaml')) {
+            editor.setValue(LZString.decompressFromEncodedURIComponent(urlParams.get('yaml')));
+        }
+
         function escapeHtml(html) {
             var text = document.createTextNode(html);
             var p = document.createElement('p');
             p.appendChild(text);
             return p.innerHTML;
         }
+
+
+        $('#shareButton').click(function () {
+            var yaml = editor.getValue();
+
+            var yamlEncode = LZString.compressToEncodedURIComponent(yaml);
+
+            Swal.fire({
+                title: 'Link Generated',
+                icon: 'success',
+                confirmButtonText: 'Copy'
+            }).then((result) => {
+                if (result.value) {
+                    var url = new URL(location.origin);
+                    
+                    if (yaml) {
+                        url.searchParams.append('yaml', yamlEncode);
+                    }
+                    navigator.clipboard.writeText(url);
+                }
+            })
+        });
 
         $('#clearButton').click(function () {
             document.getElementById("yamlInput").value = "";
@@ -116,7 +145,7 @@
                 type: "POST",
                 url: url,
                 contentType: "application/json; charset=utf-8",
-                data: JSON.stringify({  "yaml": editor.getValue() }),
+                data: JSON.stringify({ "yaml": editor.getValue() }),
                 success: function (data) {
 
                     var response = escapeHtml(data);
