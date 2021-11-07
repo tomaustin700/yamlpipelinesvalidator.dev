@@ -2,7 +2,7 @@ name: Build and deploy .NET Core Function App to Azure functions app
 on:
   push:
     branches:
-    - main
+    - master
 env:
   AZURE_FUNCTIONAPP_NAME: yamlpipelinesvalidatordev
   AZURE_FUNCTIONAPP_PACKAGE_PATH: API/publish
