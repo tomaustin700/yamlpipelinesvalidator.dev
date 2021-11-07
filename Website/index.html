@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YAMLPipelinesValidator.dev</title>
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+</head>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<script src="lib/jquery/dist/jquery.min.js"></script>
+
+<link rel="stylesheet" href="lib/codemirror/codemirror.css">
+<script src="lib/codemirror/codemirror.js"></script>
+<script src="lib/codemirror/mode/yaml/yaml.js"></script>
+<script src="lib/lz-string/lz-string.js"></script>
+
+
+<body>
+    <style>
+        .navbar-xs {
+            min-height: 36px;
+            height: 36px;
+        }
+
+        .navbar-xs .navbar-brand {
+            padding: 0px 12px;
+            font-size: 16px;
+            line-height: 28px;
+        }
+
+        .navbar-xs .navbar-nav>li>a {
+            padding-top: 0px;
+            padding-bottom: 0px;
+            line-height: 28px;
+        }
+
+        .bg-top {
+            background-color: #fafbfc !important;
+        }
+
+        .centre-align {
+            text-align: center;
+        }
+    </style>
+
+
+
+    <div class="container">
+        <main role="main" class="pb-3 background">
+            <div class="text-center maininputs">
+                <fieldset>
+                    <div class="header">
+                        <h1 class="left-align">YAML Pipelines Validator</h1>
+
+                    </div>
+                    <div class="input-div">
+                        <h5 class="left-align" for="yaml">YAML</h5>
+                        <div>
+                            <textarea class="input yaml" type="text" id="yamlInput"></textarea>
+                        </div>
+                    </div>
+                    <div class="button-div" style="float: left;">
+                        <button type="button" class="btn btn-light" id="validateButton">Validate</button>
+                        <button type="button" class="btn btn-light" id="clearButton">Clear</button>
+                    </div>
+                    <div class="button-div" style="float: right;">
+                        <button type="button" class="btn btn-light" id="shareButton">Share</button>
+                    </div>
+                </fieldset>
+
+                <div class="left-align">
+                    <h5>About</h5>
+                    <p>YAML Pipelines Validator is a validator and tester for <a
+                            href="https://azure.microsoft.com/en-us/services/devops/">Azure DevOps</a> YAML Pipelines.
+                        Use it to check your pipeline is valid before commiting it.</p>
+                </div>
+
+            </div>
+
+
+
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container centre-align">
+            <a href="https://github.com/tomaustin700/YAMLPipelineValidator">GitHub</a> - <a
+                href="https://marketplace.visualstudio.com/items?itemName=TomAustin.azure-devops-yaml-pipeline-validator">VS
+                Code Extension</a> - <a href="https://github.com/tomaustin700/YAMLPipelineValidator/issues/new">Report
+                Issue</a> - <a href="https://www.buymeacoffee.com/tomaustin">Buy Me a Coffee</a> - Built by <a
+                href="https://www.twitter.com/tomaustin700">Tom Austin</a>
+        </div>
+    </footer>
+
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/site.js" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+            var editor = CodeMirror.fromTextArea(document.getElementById("yamlInput"), {
+                mode: "yaml",
+                lineNumbers: true,
+            });
+
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+
+            if (urlParams.has('yaml')) {
+                editor.setValue(LZString.decompressFromEncodedURIComponent(urlParams.get('yaml')));
+            }
+
+            function escapeHtml(html) {
+                var text = document.createTextNode(html);
+                var p = document.createElement('p');
+                p.appendChild(text);
+                return p.innerHTML;
+            }
+
+
+            $('#shareButton').click(function () {
+                var yaml = editor.getValue();
+
+                var yamlEncode = LZString.compressToEncodedURIComponent(yaml);
+
+                Swal.fire({
+                    title: 'Link Generated',
+                    icon: 'success',
+                    confirmButtonText: 'Copy'
+                }).then((result) => {
+                    if (result.value) {
+                        var url = new URL(location.origin);
+
+                        if (yaml) {
+                            url.searchParams.append('yaml', yamlEncode);
+                        }
+                        navigator.clipboard.writeText(url);
+                    }
+                })
+            });
+
+            $('#clearButton').click(function () {
+                document.getElementById("yamlInput").value = "";
+                editor.setValue("");
+            });
+
+            $('#validateButton').click(function () {
+
+                Swal.fire({
+                    title: "Validating...",
+                    text: "Please wait",
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                })
+
+
+                var url = "https://yamlpipelinesvalidatordev.azurewebsites.net/api/Validate";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({ "yaml": editor.getValue() }),
+                    success: function (data) {
+
+                        var response = escapeHtml(data);
+                        response = response.replace(/(?:\r\n|\r|\n)/g, '<br>');
+
+                        Swal.fire({
+                            html: response,
+                            title: 'Success',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        })
+
+                    },
+                    error: function (data) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.responseText,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        })
+                    }
+                });
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

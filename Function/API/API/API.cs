@@ -23,7 +23,8 @@ namespace API
         }
 
         [Function("Validate")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "Validate")] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "POST")] HttpRequestData req,
+            FunctionContext executionContext)
         {
             var serializeOptions = new JsonSerializerOptions
             {
